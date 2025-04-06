@@ -10,10 +10,9 @@ namespace ConsoleApp1
 {
     public class Program
     {
-        public static string xmlURL = "Hotels.xml";
-        public static string xmlErrorURL = "HotelsErrors.xml";
-        public static string xsdURL = "Hotels.xsd";
-
+        public static string xmlURL = "https://corl3one.github.io/cse445-assn4/Hotels.xml";
+        public static string xmlErrorURL = "https://corl3one.github.io/cse445-assn4/HotelsErrors.xml";
+        public static string xsdURL = "https://corl3one.github.io/cse445-assn4/Hotels.xsd";
         public static void Main(string[] args)
         {
             string result = Verification(xmlURL, xsdURL);
