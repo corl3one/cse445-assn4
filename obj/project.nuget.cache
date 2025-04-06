@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "F6TiLvdQ7gU=",
+  "success": true,
+  "projectFilePath": "/Users/leonmarchand/Desktop/CSE445_assn4/ConsoleApp1.csproj",
+  "expectedPackageFiles": [
+    "/Users/leonmarchand/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

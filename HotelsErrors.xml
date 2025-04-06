@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Hotel> <!-- Error 1: Wrong root element (should be Hotels) -->
+    <Hotel> <!-- Error 2: Missing required Rating attribute -->
+        <Name>Westin</Name>
+        <!-- Error 3: Missing Phone element -->
+        <Address NearestAirport="Sky Harbor">
+            <Number>11</Number>
+            <Street>E 7th St</Street>
+            <City>Tempe</City>
+            <State>AZ</State>
+            <Zip>85281</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.5">
+        <Name>Hilton New York</Name>
+        <Name>Second Name</Name> <!-- Error 5: Two Name elements -->
+        <Phone>212-586-7000</Phone>
+        <Address> <!-- Error 4: Missing Zip sub-element -->
+            <Number>1335</Number>
+            <Street>Avenue of the Americas</Street>
+            <City>New York</City>
+            <State>NY</State>
+        </Address>
+    </Hotel>
+</Hotel>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Hotels>
+    <Hotel Rating="4.2">
+        <Name>Westin</Name>
+        <Phone>480-968-8885</Phone>
+        <Phone>800-937-8461</Phone>
+        <Address NearestAirport="Sky Harbor">
+            <Number>11</Number>
+            <Street>E 7th St</Street>
+            <City>Tempe</City>
+            <State>AZ</State>
+            <Zip>85281</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.5">
+        <Name>Hilton New York</Name>
+        <Phone>212-586-7000</Phone>
+        <Address>
+            <Number>1335</Number>
+            <Street>Avenue of the Americas</Street>
+            <City>New York</City>
+            <State>NY</State>
+            <Zip>10019</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.0">
+        <Name>Marriott Los Angeles</Name>
+        <Phone>213-612-1560</Phone>
+        <Address NearestAirport="LAX">
+            <Number>333</Number>
+            <Street>S Figueroa St</Street>
+            <City>Los Angeles</City>
+            <State>CA</State>
+            <Zip>90071</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.8">
+        <Name>Ritz-Carlton Chicago</Name>
+        <Phone>312-266-1000</Phone>
+        <Phone>800-621-6906</Phone>
+        <Address NearestAirport="O'Hare">
+            <Number>160</Number>
+            <Street>E Pearson St</Street>
+            <City>Chicago</City>
+            <State>IL</State>
+            <Zip>60611</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.3">
+        <Name>Four Seasons Miami</Name>
+        <Phone>305-358-3535</Phone>
+        <Address>
+            <Number>1435</Number>
+            <Street>Brickell Ave</Street>
+            <City>Miami</City>
+            <State>FL</State>
+            <Zip>33131</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.6">
+        <Name>Waldorf Astoria Orlando</Name>
+        <Phone>407-597-5500</Phone>
+        <Address NearestAirport="MCO">
+            <Number>14200</Number>
+            <Street>Bonnet Creek Resort Ln</Street>
+            <City>Orlando</City>
+            <State>FL</State>
+            <Zip>32821</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.1">
+        <Name>Hyatt Regency Seattle</Name>
+        <Phone>206-973-1234</Phone>
+        <Address>
+            <Number>808</Number>
+            <Street>Howell St</Street>
+            <City>Seattle</City>
+            <State>WA</State>
+            <Zip>98101</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.7">
+        <Name>St. Regis San Francisco</Name>
+        <Phone>415-284-4000</Phone>
+        <Address NearestAirport="SFO">
+            <Number>125</Number>
+            <Street>3rd St</Street>
+            <City>San Francisco</City>
+            <State>CA</State>
+            <Zip>94103</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.4">
+        <Name>Omni Dallas Hotel</Name>
+        <Phone>214-744-6664</Phone>
+        <Address>
+            <Number>555</Number>
+            <Street>S Lamar St</Street>
+            <City>Dallas</City>
+            <State>TX</State>
+            <Zip>75202</Zip>
+        </Address>
+    </Hotel>
+    <Hotel Rating="4.9">
+        <Name>Mandarin Oriental Boston</Name>
+        <Phone>617-535-8888</Phone>
+        <Address NearestAirport="BOS">
+            <Number>776</Number>
+            <Street>Boylston St</Street>
+            <City>Boston</City>
+            <State>MA</State>
+            <Zip>02199</Zip>
+        </Address>
+    </Hotel>
+</Hotels>
