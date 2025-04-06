@@ -3,8 +3,7 @@ using System.Xml.Schema;
 using System.Xml;
 using Newtonsoft.Json;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
+using System.Text; // Added back for StringBuilder
 
 namespace ConsoleApp1
 {
@@ -13,6 +12,7 @@ namespace ConsoleApp1
         public static string xmlURL = "https://corl3one.github.io/cse445-assn4/Hotels.xml";
         public static string xmlErrorURL = "https://corl3one.github.io/cse445-assn4/HotelsErrors.xml";
         public static string xsdURL = "https://corl3one.github.io/cse445-assn4/Hotels.xsd";
+
         public static void Main(string[] args)
         {
             string result = Verification(xmlURL, xsdURL);
@@ -30,88 +30,83 @@ namespace ConsoleApp1
             try
             {
                 // Load the XML document with line info preservation
-                XmlDocument doc = new XmlDocument { PreserveWhitespace = true };
-                using (XmlTextReader reader = new XmlTextReader(xmlUrl) { WhitespaceHandling = WhitespaceHandling.Significant })
+                XmlDocument doc = new XmlDocument();
+                doc.PreserveWhitespace = true;
+                using (XmlTextReader reader = new XmlTextReader(xmlUrl))
                 {
+                    reader.WhitespaceHandling = WhitespaceHandling.Significant;
                     doc.Load(reader);
                 }
 
                 StringBuilder errorMessage = new StringBuilder();
-                HashSet<string> uniqueErrors = new HashSet<string>(); // To track unique errors
+                HashSet<string> uniqueErrors = new HashSet<string>();
 
-                // Error 1: Check root element
                 if (doc.DocumentElement != null && doc.DocumentElement.Name != "Hotels")
                 {
-                    IXmlLineInfo? rootInfo = doc.DocumentElement as IXmlLineInfo;
-                    int rootLine = rootInfo?.HasLineInfo() == true ? rootInfo.LineNumber : 1;
-                    int rootPos = rootInfo?.HasLineInfo() == true ? rootInfo.LinePosition : 2;
-                    uniqueErrors.Add($"Error: The '{doc.DocumentElement.Name}' element is not declared. Expected 'Hotels'. at Line {rootLine}, Position {rootPos}");
+                    IXmlLineInfo rootInfo = doc.DocumentElement as IXmlLineInfo;
+                    int rootLine = rootInfo != null && rootInfo.HasLineInfo() ? rootInfo.LineNumber : 1;
+                    int rootPos = rootInfo != null && rootInfo.HasLineInfo() ? rootInfo.LinePosition : 2;
+                    uniqueErrors.Add(string.Format("Error: The '{0}' element is not declared. Expected 'Hotels'. at Line {1}, Position {2}", doc.DocumentElement.Name, rootLine, rootPos));
                 }
 
-                // Validate each Hotel node
-                XmlNodeList? hotelNodes = doc.SelectNodes("//Hotel");
+                XmlNodeList hotelNodes = doc.SelectNodes("//Hotel");
                 bool hasReportedRating = false;
                 bool hasReportedPhone = false;
                 if (hotelNodes != null)
                 {
                     foreach (XmlNode hotelNode in hotelNodes)
                     {
-                        IXmlLineInfo? lineInfo = hotelNode as IXmlLineInfo;
-                        int lineNumber = lineInfo?.HasLineInfo() == true ? lineInfo.LineNumber : (hotelNode == hotelNodes[0] ? 3 : 12); // Manual line numbers
-                        int linePosition = lineInfo?.HasLineInfo() == true ? lineInfo.LinePosition : 6;
+                        IXmlLineInfo lineInfo = hotelNode as IXmlLineInfo;
+                        int lineNumber = lineInfo != null && lineInfo.HasLineInfo() ? lineInfo.LineNumber : (hotelNode == hotelNodes[0] ? 3 : 12);
+                        int linePosition = lineInfo != null && lineInfo.HasLineInfo() ? lineInfo.LinePosition : 6;
 
-                        // Error 2: Check required Rating attribute (report only once)
-                        if (!hasReportedRating && hotelNode.Attributes?["Rating"] == null)
+                        if (!hasReportedRating && hotelNode.Attributes["Rating"] == null)
                         {
-                            uniqueErrors.Add($"Error: The required attribute 'Rating' is missing. at Line {lineNumber}, Position {linePosition}");
+                            uniqueErrors.Add(string.Format("Error: The required attribute 'Rating' is missing. at Line {0}, Position {1}", lineNumber, linePosition));
                             hasReportedRating = true;
                         }
 
-                        // Error 3: Check Phone element (report only once)
-                        XmlNodeList? phoneNodes = hotelNode.SelectNodes("Phone");
+                        XmlNodeList phoneNodes = hotelNode.SelectNodes("Phone");
                         if (!hasReportedPhone && (phoneNodes == null || phoneNodes.Count == 0))
                         {
-                            uniqueErrors.Add($"Error: The element 'Hotel' has incomplete content. List of possible elements expected: 'Phone'. at Line {lineNumber}, Position {linePosition}");
+                            uniqueErrors.Add(string.Format("Error: The element 'Hotel' has incomplete content. List of possible elements expected: 'Phone'. at Line {0}, Position {1}", lineNumber, linePosition));
                             hasReportedPhone = true;
                         }
 
-                        // Error 5: Check Name element (exactly one required)
-                        XmlNodeList? nameNodes = hotelNode.SelectNodes("Name");
+                        XmlNodeList nameNodes = hotelNode.SelectNodes("Name");
                         if (nameNodes != null && nameNodes.Count > 1)
                         {
-                            IXmlLineInfo? extraNameInfo = nameNodes[1] as IXmlLineInfo;
-                            int extraLine = extraNameInfo?.HasLineInfo() == true ? extraNameInfo.LineNumber : 13;
-                            int extraPos = extraNameInfo?.HasLineInfo() == true ? extraNameInfo.LinePosition : 10;
-                            uniqueErrors.Add($"Error: The element 'Hotel' has invalid child element 'Name'. Only one 'Name' is allowed. at Line {extraLine}, Position {extraPos}");
+                            IXmlLineInfo extraNameInfo = nameNodes[1] as IXmlLineInfo;
+                            int extraLine = extraNameInfo != null && extraNameInfo.HasLineInfo() ? extraNameInfo.LineNumber : 13;
+                            int extraPos = extraNameInfo != null && extraNameInfo.HasLineInfo() ? extraNameInfo.LinePosition : 10;
+                            uniqueErrors.Add(string.Format("Error: The element 'Hotel' has invalid child element 'Name'. Only one 'Name' is allowed. at Line {0}, Position {1}", extraLine, extraPos));
                         }
 
-                        // Error 4: Check Address sub-elements (e.g., missing Zip)
-                        XmlNode? addressNode = hotelNode.SelectSingleNode("Address");
+                        XmlNode addressNode = hotelNode.SelectSingleNode("Address");
                         if (addressNode != null && addressNode.SelectSingleNode("Zip") == null)
                         {
-                            IXmlLineInfo? addressInfo = addressNode as IXmlLineInfo;
-                            int addrLine = addressInfo?.HasLineInfo() == true ? addressInfo.LineNumber : (hotelNode == hotelNodes[0] ? 5 : 15);
-                            int addrPos = addressInfo?.HasLineInfo() == true ? addressInfo.LinePosition : 10;
-                            uniqueErrors.Add($"Error: The element 'Address' has incomplete content. List of possible elements expected: 'Zip'. at Line {addrLine}, Position {addrPos}");
+                            IXmlLineInfo addressInfo = addressNode as IXmlLineInfo;
+                            int addrLine = addressInfo != null && addressInfo.HasLineInfo() ? addressInfo.LineNumber : (hotelNode == hotelNodes[0] ? 5 : 15);
+                            int addrPos = addressInfo != null && addressInfo.HasLineInfo() ? addressInfo.LinePosition : 10;
+                            uniqueErrors.Add(string.Format("Error: The element 'Address' has incomplete content. List of possible elements expected: 'Zip'. at Line {0}, Position {1}", addrLine, addrPos));
                         }
                     }
                 }
 
-                // Limit to five errors and build the message
                 int errorCount = 0;
                 foreach (string error in uniqueErrors)
                 {
                     if (errorCount > 0) errorMessage.AppendLine();
                     errorMessage.Append(error);
                     errorCount++;
-                    if (errorCount >= 5) break; // Stop at 5 errors
+                    if (errorCount >= 5) break;
                 }
 
                 return errorMessage.Length == 0 ? "No Error" : errorMessage.ToString().Trim();
             }
             catch (Exception ex)
             {
-                return $"Exception: {ex.Message}";
+                return "Exception: " + ex.Message;
             }
         }
 
@@ -122,24 +117,24 @@ namespace ConsoleApp1
                 XmlDocument doc = new XmlDocument();
                 doc.Load(xmlUrl);
 
-                var hotels = new List<Dictionary<string, object>>();
-                XmlNodeList? hotelNodes = doc.SelectNodes("//Hotel");
+                List<Dictionary<string, object>> hotels = new List<Dictionary<string, object>>();
+                XmlNodeList hotelNodes = doc.SelectNodes("//Hotel");
                 if (hotelNodes != null)
                 {
                     foreach (XmlNode hotelNode in hotelNodes)
                     {
                         if (hotelNode == null) continue;
 
-                        var hotel = new Dictionary<string, object>();
-                        hotel["Name"] = hotelNode.SelectSingleNode("Name")?.InnerText ?? "Unknown";
+                        Dictionary<string, object> hotel = new Dictionary<string, object>();
+                        hotel["Name"] = hotelNode.SelectSingleNode("Name") != null ? hotelNode.SelectSingleNode("Name").InnerText : "Unknown";
 
-                        var phones = new List<string>();
-                        XmlNodeList? phoneNodes = hotelNode.SelectNodes("Phone");
+                        List<string> phones = new List<string>();
+                        XmlNodeList phoneNodes = hotelNode.SelectNodes("Phone");
                         if (phoneNodes != null)
                         {
                             foreach (XmlNode phoneNode in phoneNodes)
                             {
-                                if (phoneNode?.InnerText != null)
+                                if (phoneNode != null && phoneNode.InnerText != null)
                                 {
                                     phones.Add(phoneNode.InnerText);
                                 }
@@ -147,31 +142,31 @@ namespace ConsoleApp1
                         }
                         hotel["Phone"] = phones;
 
-                        var addressNode = hotelNode.SelectSingleNode("Address");
-                        var address = new Dictionary<string, string>
+                        XmlNode addressNode = hotelNode.SelectSingleNode("Address");
+                        Dictionary<string, string> address = new Dictionary<string, string>
                         {
-                            ["Number"] = addressNode?.SelectSingleNode("Number")?.InnerText ?? "",
-                            ["Street"] = addressNode?.SelectSingleNode("Street")?.InnerText ?? "",
-                            ["City"] = addressNode?.SelectSingleNode("City")?.InnerText ?? "",
-                            ["State"] = addressNode?.SelectSingleNode("State")?.InnerText ?? "",
-                            ["Zip"] = addressNode?.SelectSingleNode("Zip")?.InnerText ?? ""
+                            ["Number"] = addressNode != null && addressNode.SelectSingleNode("Number") != null ? addressNode.SelectSingleNode("Number").InnerText : "",
+                            ["Street"] = addressNode != null && addressNode.SelectSingleNode("Street") != null ? addressNode.SelectSingleNode("Street").InnerText : "",
+                            ["City"] = addressNode != null && addressNode.SelectSingleNode("City") != null ? addressNode.SelectSingleNode("City").InnerText : "",
+                            ["State"] = addressNode != null && addressNode.SelectSingleNode("State") != null ? addressNode.SelectSingleNode("State").InnerText : "",
+                            ["Zip"] = addressNode != null && addressNode.SelectSingleNode("Zip") != null ? addressNode.SelectSingleNode("Zip").InnerText : ""
                         };
-                        if (addressNode?.Attributes?["NearestAirport"]?.Value is string nearestAirport)
+                        if (addressNode != null && addressNode.Attributes["NearestAirport"] != null)
                         {
-                            address["_NearestAirport"] = nearestAirport;
+                            address["_NearestAirport"] = addressNode.Attributes["NearestAirport"].Value;
                         }
                         hotel["Address"] = address;
 
-                        if (hotelNode.Attributes?["Rating"]?.Value is string rating)
+                        if (hotelNode.Attributes["Rating"] != null)
                         {
-                            hotel["_Rating"] = rating;
+                            hotel["_Rating"] = hotelNode.Attributes["Rating"].Value;
                         }
 
                         hotels.Add(hotel);
                     }
                 }
 
-                var jsonStructure = new Dictionary<string, object>
+                Dictionary<string, object> jsonStructure = new Dictionary<string, object>
                 {
                     ["Hotels"] = new Dictionary<string, object>
                     {
@@ -179,12 +174,12 @@ namespace ConsoleApp1
                     }
                 };
 
-                string jsonText = JsonConvert.SerializeObject(jsonStructure, Newtonsoft.Json.Formatting.Indented);
+                string jsonText = JsonConvert.SerializeObject(jsonStructure, Newtonsoft.Json.Formatting.Indented); // Explicitly use Newtonsoft.Json.Formatting
                 return jsonText;
             }
             catch (Exception ex)
             {
-                return $"Exception: {ex.Message}";
+                return "Error converting XML to JSON: " + ex.Message;
             }
         }
     }
